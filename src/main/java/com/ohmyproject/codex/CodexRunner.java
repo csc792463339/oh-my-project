@@ -11,8 +11,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * 以子进程方式运行 codex exec / codex exec resume。
@@ -91,7 +94,7 @@ public class CodexRunner {
 
     private List<String> buildCommand(CodexRunRequest req) {
         List<String> cmd = new ArrayList<>();
-        cmd.add(props.codex().executable());
+        cmd.addAll(resolveExecutableCommand());
         cmd.add("exec");
         boolean resume = req.resumeThreadId() != null && !req.resumeThreadId().isBlank();
         if (resume) {
@@ -121,6 +124,86 @@ public class CodexRunner {
         }
         cmd.add("-");
         return cmd;
+    }
+
+    private List<String> resolveExecutableCommand() {
+        String configured = props.codex().executable();
+        if (!isWindows()) {
+            return List.of(configured);
+        }
+
+        Path resolved = resolveWindowsExecutable(configured);
+        if (resolved == null) {
+            throw new IllegalStateException("Codex CLI executable not found: " + configured);
+        }
+
+        String lowerName = resolved.getFileName().toString().toLowerCase(Locale.ROOT);
+        if (lowerName.endsWith(".cmd") || lowerName.endsWith(".bat")) {
+            return List.of("cmd.exe", "/c", resolved.toString());
+        }
+        if (lowerName.endsWith(".ps1")) {
+            return List.of("powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", resolved.toString());
+        }
+        return List.of(resolved.toString());
+    }
+
+    private Path resolveWindowsExecutable(String configured) {
+        Path configuredPath = Path.of(configured);
+        Path candidate = resolveWindowsCandidate(configuredPath);
+        if (candidate != null) {
+            return candidate;
+        }
+
+        String pathEnv = System.getenv("PATH");
+        if (pathEnv == null || pathEnv.isBlank()) {
+            return null;
+        }
+
+        for (String dir : pathEnv.split(java.io.File.pathSeparator)) {
+            if (dir == null || dir.isBlank()) {
+                continue;
+            }
+            candidate = resolveWindowsCandidate(Path.of(dir, configuredPath.getFileName().toString()));
+            if (candidate != null) {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
+    private Path resolveWindowsCandidate(Path base) {
+        if (Files.isRegularFile(base) && isDirectlyLaunchable(base)) {
+            return base;
+        }
+
+        String fileName = base.getFileName().toString();
+        String lower = fileName.toLowerCase(Locale.ROOT);
+        if (lower.endsWith(".cmd") || lower.endsWith(".bat") || lower.endsWith(".ps1")) {
+            if (Files.isRegularFile(base)) {
+                return base;
+            }
+            return null;
+        }
+
+        Path parent = base.getParent();
+        for (String suffix : List.of(".cmd", ".bat", ".exe", ".com", ".ps1")) {
+            Path candidate = parent == null ? Path.of(fileName + suffix) : parent.resolve(fileName + suffix);
+            if (Files.isRegularFile(candidate)) {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean isDirectlyLaunchable(Path path) {
+        String lower = path.getFileName().toString().toLowerCase(Locale.ROOT);
+        return lower.endsWith(".exe") || lower.endsWith(".com");
+    }
+
+    private boolean isWindows() {
+        return System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("win");
     }
 
     private void drainStderr(InputStream err, CodexEventHandler handler) {
