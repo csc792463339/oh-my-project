@@ -5,6 +5,7 @@ import { streamChat } from '../api/sse';
 import MarkdownView from '../components/MarkdownView';
 import StatusIndicator from '../components/StatusIndicator';
 import AttachmentChip, { PendingUpload } from '../components/AttachmentChip';
+import { randomUUID } from '../utils/uuid';
 
 interface SessionSummary {
   sessionId: string;
@@ -175,7 +176,7 @@ export default function ChatPage() {
     const newItems: PendingUpload[] = accepted.map((file) => {
       const isImg = IMAGE_EXTS.includes(extOf(file.name));
       return {
-        tempId: crypto.randomUUID(),
+        tempId: randomUUID(),
         file,
         previewUrl: isImg ? URL.createObjectURL(file) : undefined,
         status: 'uploading',
