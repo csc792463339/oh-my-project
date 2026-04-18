@@ -36,14 +36,14 @@ export default function AdminSessionsPage() {
           <tbody>
             {items.map((s) => (
               <tr key={s.sessionId} style={{ cursor: 'pointer' }} onClick={() => open(s.sessionId)}>
-                <td>{s.title}</td>
-                <td style={{ fontFamily: 'monospace', fontSize: 12 }}>{s.userId.slice(0, 8)}</td>
-                <td>{new Date(s.lastActiveAt).toLocaleString()}</td>
+                <td data-label="标题">{s.title}</td>
+                <td data-label="用户" style={{ fontFamily: 'monospace', fontSize: 12 }}>{s.userId.slice(0, 8)}</td>
+                <td data-label="最近活跃">{new Date(s.lastActiveAt).toLocaleString()}</td>
               </tr>
             ))}
             {items.length === 0 && (
               <tr>
-                <td colSpan={3} className="empty">
+                <td colSpan={3} className="empty" data-label="">
                   暂无会话
                 </td>
               </tr>
