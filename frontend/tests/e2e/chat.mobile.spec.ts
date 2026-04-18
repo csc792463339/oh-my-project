@@ -21,7 +21,8 @@ test.describe('聊天页 · 移动端', () => {
     expect(box!.y + box!.height).toBeGreaterThan(viewport.height - 80);
   });
 
-  test('发送与附件按钮满足 44×44 触控命中', async ({ page }) => {
+  test('发送与附件按钮满足 44×44 触控命中（仅 mobile）', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile', '仅 mobile project 运行');
     await page.goto('/');
     const sendOrAttach = page.locator('.composer button').first();
     await expect(sendOrAttach).toBeVisible();
@@ -30,7 +31,9 @@ test.describe('聊天页 · 移动端', () => {
     expect(box!.height).toBeGreaterThanOrEqual(44);
   });
 
-  test('输入并发送文本时消息气泡出现', async ({ page }) => {
+  test('输入并发送文本时消息气泡出现（需后端）', async ({ page }, testInfo) => {
+    test.skip(!process.env.E2E_BACKEND, '需 E2E_BACKEND=1 且后端运行中');
+    test.skip(testInfo.project.name !== 'mobile', '仅 mobile project 运行');
     await page.goto('/');
     const textarea = page.locator('.composer textarea');
     await textarea.fill('你好，移动端测试');

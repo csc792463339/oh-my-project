@@ -110,16 +110,16 @@ export default function AdminProjectsPage() {
         <tbody>
           {items.map((p) => (
             <tr key={p.id}>
-              <td data-label=”名称”>{p.name}</td>
-              <td data-label=”路径” style={{ fontFamily: 'ui-monospace, SFMono-Regular, monospace', fontSize: 12 }}>{p.path}</td>
-              <td data-label=”介绍” style={{ color: '#4b5563', whiteSpace: 'pre-wrap' }}>
+              <td data-label="名称">{p.name}</td>
+              <td data-label="路径" style={{ fontFamily: 'ui-monospace, SFMono-Regular, monospace', fontSize: 12 }}>{p.path}</td>
+              <td data-label="介绍" style={{ color: '#4b5563', whiteSpace: 'pre-wrap' }}>
                 {p.description || <span style={{ color: '#9ca3af' }}>—</span>}
               </td>
-              <td data-label=”操作” className=”actions”>
-                <button className=”btn secondary” onClick={() => startEdit(p)} style={{ marginRight: 8 }}>
+              <td data-label="操作" className="actions">
+                <button className="btn secondary" onClick={() => startEdit(p)} style={{ marginRight: 8 }}>
                   编辑
                 </button>
-                <button className=”btn danger” onClick={() => remove(p.id)}>
+                <button className="btn danger" onClick={() => remove(p.id)}>
                   删除
                 </button>
               </td>
@@ -127,8 +127,8 @@ export default function AdminProjectsPage() {
           ))}
           {items.length === 0 && (
             <tr>
-              <td colSpan={4} className=”empty” data-label=””>
-                暂无项目，点击”新增项目”开始
+              <td colSpan={4} className="empty" data-label="">
+                暂无项目，点击"新增项目"开始
               </td>
             </tr>
           )}

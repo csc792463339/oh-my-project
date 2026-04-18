@@ -18,6 +18,7 @@ export default function AdminLoginPage() {
 
   return (
     <div
+      className="admin-login-card"
       style={{
         maxWidth: 360,
         margin: '120px auto',
