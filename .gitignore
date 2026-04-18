@@ -20,6 +20,3 @@ frontend/dist/
 .playwright-cli/
 frontend/.playwright-cli/
 
-# 构建产物（由前端构建生成，不入库）
-src/main/resources/static/assets/
-src/main/resources/static/index.html
