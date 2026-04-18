@@ -1,14 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
 
 export default function AdminLayout() {
   const nav = useNavigate();
+  const location = useLocation();
   const [checked, setChecked] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
     api.adminMe().then(() => setChecked(true)).catch(() => nav('/admin/login'));
   }, [nav]);
+
+  useEffect(() => {
+    setNavOpen(false);
+  }, [location.pathname]);
 
   async function logout() {
     await api.adminLogout();
@@ -19,7 +25,20 @@ export default function AdminLayout() {
 
   return (
     <div className="admin-layout">
-      <nav>
+      <div className="admin-topbar">
+        <button
+          type="button"
+          className="admin-nav-toggle"
+          data-testid="nav-toggle"
+          aria-label="打开导航"
+          onClick={() => setNavOpen(true)}
+        >
+          <span aria-hidden>☰</span>
+        </button>
+        <div className="admin-topbar-title">后台</div>
+      </div>
+
+      <nav className={navOpen ? 'open' : ''}>
         <div className="brand">Oh My Project 后台</div>
         <NavLink to="/admin/projects" className={({ isActive }) => (isActive ? 'active' : '')}>
           项目管理
@@ -34,6 +53,15 @@ export default function AdminLayout() {
           </button>
         </div>
       </nav>
+
+      {navOpen && (
+        <div
+          className="admin-backdrop"
+          role="presentation"
+          onClick={() => setNavOpen(false)}
+        />
+      )}
+
       <main>
         <Outlet />
       </main>
