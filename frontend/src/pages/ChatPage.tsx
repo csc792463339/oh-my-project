@@ -48,6 +48,7 @@ export default function ChatPage() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [pending, setPending] = useState<PendingUpload[]>([]);
   const [dragOver, setDragOver] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -352,7 +353,7 @@ export default function ChatPage() {
 
   return (
     <div className="layout">
-      <aside className="sidebar">
+      <aside className={'sidebar' + (sidebarOpen ? ' open' : '')}>
         <header>
           <select value={projectId} onChange={(e) => setProjectId(e.target.value)}>
             <option value="">选择项目…</option>
@@ -372,7 +373,7 @@ export default function ChatPage() {
             <div
               key={s.sessionId}
               className={'session-item' + (currentSession?.sessionId === s.sessionId ? ' active' : '')}
-              onClick={() => openSession(s.sessionId)}
+              onClick={() => { openSession(s.sessionId); setSidebarOpen(false); }}
             >
               <span className="title">{s.title || '无标题'}</span>
               <button
@@ -401,6 +402,14 @@ export default function ChatPage() {
         </footer>
       </aside>
 
+      {sidebarOpen && (
+        <div
+          className="sidebar-backdrop"
+          role="presentation"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <section
         className={'main' + (dragOver ? ' drag-over' : '')}
         onDragOver={(e) => {
@@ -415,6 +424,14 @@ export default function ChatPage() {
         onDrop={handleDrop}
       >
         <header>
+          <button
+            type="button"
+            className="sidebar-toggle"
+            aria-label="打开侧边栏"
+            onClick={() => setSidebarOpen(true)}
+          >
+            ☰
+          </button>
           <span>{headerTitle}</span>
           {headerProject && <span className="header-badge">{headerProject}</span>}
         </header>
