@@ -1,0 +1,67 @@
+- generic [ref=e70]:
+  - complementary [ref=e71]:
+    - generic [ref=e72]:
+      - combobox [ref=e73]:
+        - option "选择项目…"
+        - option "codex-help 本项目" [selected]
+      - button "＋" [ref=e74] [cursor=pointer]
+    - generic [ref=e76]: 暂无会话，点右上角“+”新建
+    - generic [ref=e77]:
+      - generic [ref=e78]: Code Insight Chat
+      - link "管理后台" [ref=e79] [cursor=pointer]:
+        - /url: /admin/login
+  - generic [ref=e80]:
+    - generic [ref=e81]: 新会话 · codex-help 本项目
+    - generic [ref=e82]:
+      - generic [ref=e87]: 这个项目的管理员口令放在哪里？
+      - generic [ref=e96]:
+        - paragraph [ref=e97]:
+          - text: 使用
+          - code [ref=e98]: using-superpowers
+          - text: 和
+          - code [ref=e99]: analyze
+          - text: 这两个技能处理这次请求：我先读取技能说明和仓库里的相关配置/源码，再定位“管理员口令”是写死在代码里、放在配置里，还是走环境变量/数据库。
+        - paragraph [ref=e100]: 下一步直接查证三类位置：配置文件、鉴权/登录逻辑、初始化数据。这样能区分“管理员口令在仓库里”还是“仓库里只留了读取入口”。
+        - paragraph [ref=e101]: 已经定位到一个强信号：主配置里出现了管理员密码字段。现在补齐调用链，确认登录时是不是就拿这个字段做比对，而不是再去数据库或别的地方取。
+        - paragraph [ref=e102]: 调用链已经清楚了：前端把口令提交到管理员登录接口，后端直接拿提交值和配置项比对。我再看一下测试里的覆盖方式，确认这个口令是不是也支持被启动参数替换。
+        - paragraph [ref=e103]:
+          - text: 结论很直接：这个项目的默认管理员口令放在后端配置文件
+          - link "application.yml" [ref=e104] [cursor=pointer]:
+            - /url: /Users/csc/github/codex-help/src/main/resources/application.yml:8
+          - text: 里，对应的是
+          - code [ref=e105]: app.admin.password
+          - text: 。当前仓库里的默认值是
+          - code [ref=e106]: change-me
+          - text: 。README 也明确写了这一点，见
+          - link "README.md" [ref=e107] [cursor=pointer]:
+            - /url: /Users/csc/github/codex-help/README.md:18
+          - text: 。
+        - paragraph [ref=e108]:
+          - text: 调用流程是这样的：前端登录页把你输入的口令发到管理员登录接口，见
+          - link "AdminLoginPage.tsx" [ref=e109] [cursor=pointer]:
+            - /url: /Users/csc/github/codex-help/frontend/src/pages/admin/AdminLoginPage.tsx:10
+          - text: 和
+          - link "client.ts" [ref=e110] [cursor=pointer]:
+            - /url: /Users/csc/github/codex-help/frontend/src/api/client.ts:38
+          - text: ；后端把配置文件里的管理员口令读进来，见
+          - link "AppProperties.java" [ref=e111] [cursor=pointer]:
+            - /url: /Users/csc/github/codex-help/src/main/java/com/codeinsight/config/AppProperties.java:5
+          - text: ，然后在
+          - link "AdminAuthController.java" [ref=e112] [cursor=pointer]:
+            - /url: /Users/csc/github/codex-help/src/main/java/com/codeinsight/auth/AdminAuthController.java:23
+          - text: 里直接拿“用户输入”和“配置中的口令”做比较。相同就发一个登录令牌到浏览器，不同就返回“invalid password”。之后真正拦管理员接口的，不再是口令本身，而是这个登录令牌，见
+          - link "AdminAuthFilter.java" [ref=e113] [cursor=pointer]:
+            - /url: /Users/csc/github/codex-help/src/main/java/com/codeinsight/auth/AdminAuthFilter.java:17
+          - text: 和
+          - link "AdminTokenStore.java" [ref=e114] [cursor=pointer]:
+            - /url: /Users/csc/github/codex-help/src/main/java/com/codeinsight/auth/AdminTokenStore.java:9
+          - text: 。
+        - paragraph [ref=e115]:
+          - text: 我在这个仓库里没有看到“管理员口令存数据库”“单独密文文件”“前端本地保存口令”这类逻辑，所以基于代码判断，它就是放在后端配置里，而且是明文配置。需要补一句：如果你问的是“某个已部署环境现在实际在用的口令”，我不确定，因为测试里也能把这个值临时覆盖掉，见
+          - link "WebEndpointsIT.java" [ref=e116] [cursor=pointer]:
+            - /url: /Users/csc/github/codex-help/src/test/java/com/codeinsight/WebEndpointsIT.java:21
+          - text: 。也就是说，仓库能证明“默认口令和读取位置”在这里，但不能百分之百证明线上运行时没有被外部配置替换。
+      - generic [ref=e90]: "Reconnecting... 2/5 (unexpected status 404 Not Found: {\"error\":\"Not Found\",\"message\":\"Route /openai/responses not found\",\"timestamp\":\"2026-04-18T10:09:51.011Z\"}, url: wss://cursor.scihub.edu.kg/openai/responses, request id: pnvupsnvkk)"
+    - generic [ref=e84]:
+      - textbox "请输入你的问题…" [ref=e85]
+      - button "发送" [disabled] [ref=e117]

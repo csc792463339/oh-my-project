@@ -1,0 +1,25 @@
+target/
+data/
+*.log
+
+# frontend
+frontend/node_modules/
+frontend/.node/
+frontend/dist/
+
+# ide
+.idea/
+.vscode/
+*.iml
+
+# os
+.DS_Store
+
+# tool state
+.omx/
+.playwright-cli/
+frontend/.playwright-cli/
+
+# 构建产物（由前端构建生成，不入库）
+src/main/resources/static/assets/
+src/main/resources/static/index.html

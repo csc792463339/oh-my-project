@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: oh-my-project
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 15MB
+
+app:
+  admin:
+    password: "123456"
+  codex:
+    executable: "codex"
+    sandbox: "read-only"
+    color: "never"
+    skip-git-repo-check: true
+  data:
+    dir: "./data"
+  uploads:
+    dir: "./data/uploads"
+    meta-dir: "./data/attachments"
+    max-file-bytes: 10485760
+    max-text-file-bytes: 524288
+    max-files-per-message: 6
+    image-mime-whitelist:
+      - image/png
+      - image/jpeg
+      - image/webp
+      - image/gif
+    text-extension-whitelist:
+      - .txt
+      - .log
+      - .json
+      - .md
+      - .csv
+      - .xml
+      - .yaml
+      - .yml
+      - .ini
+      - .conf
+    text-mime-prefixes:
+      - text/
+      - application/json
+      - application/xml
+      - application/x-yaml
+    max-prompt-attachment-chars: 120000
+
+logging:
+  level:
+    com.ohmyproject: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level %logger{0} - %msg%n"
